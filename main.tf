@@ -1,9 +1,17 @@
 provider "aws" {
+  alias = "us-east-1"
+  version = "~> 2.0"
+  region = "us-east-1"
+}
+
+provider "aws" {
+  alias = "us-east-2"
   version = "~> 2.0"
   region  = "us-east-2"  
 }
 
 resource "aws_instance" "dev" {
+  provider = aws.us-east-2
   count = 3
   ami = "ami-0fc20dd1da406780b"
   instance_type = "t2.micro"
@@ -15,6 +23,7 @@ resource "aws_instance" "dev" {
 }
 
 resource "aws_instance" "dev4" {
+  provider = aws.us-east-2
   ami = "ami-0fc20dd1da406780b"
   instance_type = "t2.micro"
   key_name = "dwfranco_kp"
@@ -26,6 +35,7 @@ resource "aws_instance" "dev4" {
 }
 
 resource "aws_instance" "dev5" {
+  provider = aws.us-east-2
   ami = "ami-0fc20dd1da406780b"
   instance_type = "t2.micro"
   key_name = "dwfranco_kp"
@@ -33,33 +43,23 @@ resource "aws_instance" "dev5" {
     Name = "david_dev_5"
   }
   vpc_security_group_ids = ["${aws_security_group.david_acesso_ssh.id}"]
+  depends_on = [aws_dynamodb_table.dynamodb-homologacao]
 }
 
-resource "aws_security_group" "david_acesso_ssh" {
-  name        = "david_acesso_ssh"
-  description = "david_acesso_ssh"
+resource "aws_dynamodb_table" "dynamodb-homologacao" {
+  provider = aws.us-east-2
+  name = "GameScores"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key = "UserId"
+  range_key = "GameTitle"
 
-  ingress {
-    # TLS (change to whatever ports you need)
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    # Please restrict your ingress to only necessary IPs and ports.
-    # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
-    cidr_blocks = ["0.0.0.0/0"]
+  attribute {
+    name = "UserId"
+    type = "S"
   }
 
-  tags = {
-    Name = "david_acesso_ssh"
-  }
-}
-
-resource "aws_s3_bucket" "david_dev_4" {
-  bucket = "tf-test-david-dev-4"
-  acl    = "private"
-
-  tags = {
-    Name        = "My bucket"
-    Environment = "david_dev"
+  attribute {
+    name = "GameTitle"
+    type = "S"
   }
 }
