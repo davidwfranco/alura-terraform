@@ -1,6 +1,6 @@
-resource "aws_s3_bucket" "david_dev_4" {
+resource "aws_s3_bucket" "david_dev" {
   provider = aws.us-east-2
-  bucket = "tf-test-david-dev-4"
+  bucket = "tf-test-david-dev"
   acl    = "private"
 
   tags = {
