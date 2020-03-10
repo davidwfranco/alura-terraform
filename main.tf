@@ -12,35 +12,35 @@ provider "aws" {
 
 resource "aws_instance" "dev" {
   provider = aws.us-east-2
-  count = 3
-  ami = "ami-0fc20dd1da406780b"
+  count = 2
+  ami = var.amis["us-east-2-ubuntu18"]
   instance_type = "t2.micro"
-  key_name = "dwfranco_kp"
+  key_name = var.key_name
   tags = {
     Name = "david_dev_${count.index}"
   }
-  vpc_security_group_ids = ["${aws_security_group.david_acesso_ssh.id}"]
+  vpc_security_group_ids = [aws_security_group.david_acesso_ssh.id]
+}
+
+resource "aws_instance" "dev3" {
+  provider = aws.us-east-2
+  ami = var.amis["us-east-2-amzLinux"]
+  instance_type = "t2.micro"
+  key_name = var.key_name
+  tags = {
+    Name = "david_dev_3"
+  }
+  vpc_security_group_ids = [aws_security_group.david_acesso_ssh.id]
+  depends_on = [aws_s3_bucket.david_dev]
 }
 
 resource "aws_instance" "dev4" {
   provider = aws.us-east-2
-  ami = "ami-0fc20dd1da406780b"
+  ami = var.amis["us-east-2-amzLinNetCoreMono"]
   instance_type = "t2.micro"
-  key_name = "dwfranco_kp"
+  key_name = var.key_name
   tags = {
     Name = "david_dev_4"
-  }
-  vpc_security_group_ids = ["${aws_security_group.david_acesso_ssh.id}"]
-  depends_on = [aws_s3_bucket.david_dev_4]
-}
-
-resource "aws_instance" "dev5" {
-  provider = aws.us-east-2
-  ami = "ami-0fc20dd1da406780b"
-  instance_type = "t2.micro"
-  key_name = "dwfranco_kp"
-  tags = {
-    Name = "david_dev_5"
   }
   vpc_security_group_ids = ["${aws_security_group.david_acesso_ssh.id}"]
   depends_on = [aws_dynamodb_table.dynamodb-homologacao]
